@@ -76,7 +76,7 @@
           dataType: "json",
           success: function (data) {
             var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://www.koworkerai.com/assets/img/logo/logo-m.svg" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' +
-              data.response + '<span class="msg_time">' + str_time + '</span></div></div>';
+              data.response.result + '<span class="msg_time">' + str_time + '</span></div></div>';
             $("#messageFormeight").append($.parseHTML(botHtml));
           },
           error: function (xhr, status, error) {
