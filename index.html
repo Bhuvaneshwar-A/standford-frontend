@@ -63,8 +63,10 @@
     </div>
 
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-    <script>
+   <script>
     $(document).ready(function () {
+        let sessionId;
+
         $("#messageArea").on("submit", function (event) {
             event.preventDefault();
 
@@ -82,11 +84,10 @@
             scrollToBottom();
 
             $.ajax({
-                data: {
-                    msg: rawText,
-                },
+                data: JSON.stringify({ "question": rawText, "session_id": sessionId }),
                 type: "POST",
-                url: "https://stanford-ai-bot-python.azurewebsites.net/api/chat_completion",
+                url: "/chat_completion",
+                contentType: "application/json; charset=utf-8"
             }).done(function (data) {
                 var botHtml = '<div class="d-flex justify-content-start mb-4">' +
                               '<div class="img_cont_msg"><img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg"></div>' +
@@ -95,32 +96,6 @@
                               '<span class="msg_time">' + str_time + '</span></div></div>';
 
                 $("#messageFormeight").append($.parseHTML(botHtml));
-
-<!--                // Display Sources-->
-<!--                if (data.sources.length > 0) {-->
-<!--                    for (var i = 0; i < data.sources.length; i++) {-->
-<!--                        var sourceHtml = '<div class="source-suggestion-container"><span class="source-suggestion-label"></span>';-->
-<!--                        sourceHtml += '<a href="' + data.sources[i] + '" target="_blank" class="source-suggestion-link">' + data.sources[i] + '</a></div>';-->
-<!--                        $("#messageFormeight").append($.parseHTML(sourceHtml));-->
-<!--                    }-->
-<!--                } else {-->
-<!--                    $("#messageFormeight").append('<div class="source-suggestion-container"><span class="source-suggestion-label"></span> No sources available.</div>');-->
-<!--                }-->
-
-
-<!--                // Display Suggestions near message area-->
-<!--                var suggestionsHtml = '<div class="suggestion-container">';-->
-<!--                if (data.suggestions.length > 0) {-->
-<!--                    suggestionsHtml += '<span class="source-suggestion-label">Suggestions:</span><br>';-->
-<!--                    for (var i = 0; i < data.suggestions.length; i++) {-->
-<!--                        suggestionsHtml += '<span class="suggestion-item" data-suggestion="' + data.suggestions[i] + '">' + data.suggestions[i] + '</span><br>';-->
-<!--                    }-->
-<!--                } else {-->
-<!--                    suggestionsHtml += '<span class="source-suggestion-label">Suggestions:</span><br>No suggestions available.';-->
-<!--                }-->
-                suggestionsHtml += '</div>';
-                $("#messageArea").before(suggestionsHtml);
-
                 scrollToBottom();
             });
         });
@@ -134,8 +109,8 @@
 
         // Make sure the modal event handlers are set up correctly
         $('body').on('show.bs.modal', '#promptModal', function () {
-            $.get('https://stanford-ai-bot-python.azurewebsites.net/api/get_current_prompt', function (data) {
-                $('#newPrompt').val(data.currentPrompt);
+            $.get('/fetch_current_prompt', function (data) {
+                $('#newPrompt').val(data.response);
             });
         });
 
@@ -143,7 +118,7 @@
             var updatedPrompt = $('#newPrompt').val();
             $.ajax({
                 type: "POST",
-                url: "https://stanford-ai-bot-python.azurewebsites.net/api/update_prompt",
+                url: "/update_prompt",
                 data: JSON.stringify({ "newPrompt": updatedPrompt }),
                 contentType: "application/json; charset=utf-8",
                 success: function () {
@@ -160,6 +135,25 @@
             var chatWindow = document.getElementById("messageFormeight");
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
+
+        // Initialize session
+        $.ajax({
+            type: "GET",
+            url: "/init/session",
+            success: function (data) {
+                sessionId = data.session_id;
+                var botHtml = '<div class="d-flex justify-content-start mb-4">' +
+                              '<div class="img_cont_msg"><img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg"></div>' +
+                              '<div class="msg_cotainer">' +
+                              data.message +
+                              '</div></div>';
+                $("#messageFormeight").append($.parseHTML(botHtml));
+                scrollToBottom();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error initializing session:', error);
+            }
+        });
     });
 </script>
 </body>
