@@ -86,7 +86,7 @@
             $.ajax({
                 data: JSON.stringify({ "question": rawText, "session_id": sessionId }),
                 type: "POST",
-                url: "/chat_completion",
+                url: "https://stanford-ai-bot-python.azurewebsites.net/api/chat_completion",
                 contentType: "application/json; charset=utf-8"
             }).done(function (data) {
                 var botHtml = '<div class="d-flex justify-content-start mb-4">' +
@@ -109,7 +109,7 @@
 
         // Make sure the modal event handlers are set up correctly
         $('body').on('show.bs.modal', '#promptModal', function () {
-            $.get('/fetch_current_prompt', function (data) {
+            $.get('https://stanford-ai-bot-python.azurewebsites.net/api/get_current_prompt', function (data) {
                 $('#newPrompt').val(data.response);
             });
         });
@@ -118,7 +118,7 @@
             var updatedPrompt = $('#newPrompt').val();
             $.ajax({
                 type: "POST",
-                url: "/update_prompt",
+                url: "https://stanford-ai-bot-python.azurewebsites.net/api/update_prompt",
                 data: JSON.stringify({ "newPrompt": updatedPrompt }),
                 contentType: "application/json; charset=utf-8",
                 success: function () {
