@@ -139,7 +139,7 @@
         // Initialize session
         $.ajax({
             type: "GET",
-            url: "/init/session",
+            url: "https://stanford-ai-bot-python.azurewebsites.net/api/init/session",
             success: function (data) {
                 sessionId = data.session_id;
                 var botHtml = '<div class="d-flex justify-content-start mb-4">' +
